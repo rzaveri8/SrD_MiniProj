@@ -4,6 +4,39 @@ const app = express()
 const request = require('request');
 const apiKey = '30c490a21bf9fd4c42db618dd4ea1147';
 
+const {google} = require('googleapis');
+
+const oauth2Client = new google.auth.OAuth2(
+  678839426958-3bh9ge6hrtrkm154137u3i21ki9j85kr.apps.googleusercontent.com,//client ID
+  bJKSmM9QBN3tMs2JYFCmXpuZ, //client secret
+  YOUR_REDIRECT_URL
+);
+
+// generate a url that asks permissions for Blogger and Google Calendar scopes
+const scopes = [
+  'https://www.googleapis.com/auth/blogger',
+  'https://www.googleapis.com/auth/calendar'
+];
+
+const url = oauth2Client.generateAuthUrl({
+  // 'online' (default) or 'offline' (gets refresh_token)
+  access_type: 'offline',
+
+  // If you only need one scope you can pass it as a string
+  scope: scopes
+});
+
+//const {tokens} = await oauth2Client.getToken(code)
+//oauth2Client.setCredentials(tokens);
+
+oauth2Client.on('tokens', (tokens) => {
+  if (tokens.refresh_token) {
+    // store the refresh_token in my database!
+    console.log(tokens.refresh_token);
+  }
+  console.log(tokens.access_token);
+});
+
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs')
